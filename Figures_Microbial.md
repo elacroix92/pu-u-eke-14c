@@ -1,7 +1,8 @@
-Pu’u Eke - Microbial Figures
+JGR Biogeosciences - Microbial Figures
 ================
 Emily Lacroix
-9/23/2021
+
+Last update: 1/13/2022
 
 -   [Set-up](#set-up)
     -   [libraries](#libraries)
@@ -11,6 +12,7 @@ Emily Lacroix
         -   [Filter and subset](#filter-and-subset)
         -   [Sample Info](#sample-info)
         -   [Putative Anaerobes](#putative-anaerobes)
+        -   [16S abundance](#16s-abundance)
 -   [Figures](#figures)
     -   [Figure 5a: 16S rRNA Gene
         Copies](#figure-5a-16s-rrna-gene-copies)
@@ -18,26 +20,14 @@ Emily Lacroix
         anaerobes](#figure-5b-relative-abundance-of-putative-anaerobes)
         -   [ID the 2 dominant putative anaerobe
             phyla](#id-the-2-dominant-putative-anaerobe-phyla)
-    -   [Figure SI5: NMDS](#figure-si5-nmds)
-    -   [Figure SI6: Abundant phyla](#figure-si6-abundant-phyla)
+    -   [Figure S5: NMDS](#figure-s5-nmds)
+    -   [Figure S6: Abundant phyla](#figure-s6-abundant-phyla)
 
 # Set-up
 
 ## libraries
 
     library(tidyverse)
-
-    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-
-    ## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-    ## ✓ tibble  3.1.3     ✓ dplyr   1.0.7
-    ## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
-    ## ✓ readr   2.0.0     ✓ forcats 0.5.1
-
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## x dplyr::filter() masks stats::filter()
-    ## x dplyr::lag()    masks stats::lag()
-
     library(readxl)
     library(phyloseq)
 
@@ -49,7 +39,7 @@ Emily Lacroix
 
     phyloseq_object_file <- "MPC_16S_phyloseq_2019_07_23.rds"
 
-    parent_data_file <- "GCB2021_PuuEke_AllData.xlsx"
+    parent_data_file <- "PuuEke_AllData.xlsx"
 
 # Analysis
 
@@ -92,8 +82,7 @@ Save off the taxonomic information
       phyloseq_upperhzn_rel_abund %>% 
       tax_table() %>% 
       as("matrix") %>% 
-      as_tibble(rownames = "OTU") %>% 
-      rename(asv = OTU)
+      as_tibble(rownames = "asv")
 
 ### Sample Info
 
@@ -119,21 +108,43 @@ Read-in the ASVs identified as putative anaerobes per RAxML tree
       select(asv = ASV) %>% 
       mutate(anaerobe = TRUE)
 
+### 16S abundance
+
+    abund_16s <- 
+      parent_data_file %>% 
+      read_xlsx(sheet = "qPCR") %>% 
+      mutate(
+        across(horizon, ~ factor(., levels = c("Bh1", "Bhg", "Bh2", "Bs")))
+      ) %>% 
+      group_by(sample_id, horizon, depth, avg_dist_mm, pfp_distance_mm) %>% 
+      summarise(
+        mean_log_copy_per_g_soil = mean(log_copies_per_g_soil, na.rm = TRUE),
+        se_log_copy_per_g_soil = sd(log_copies_per_g_soil) / sqrt(n())
+      ) 
+
 # Figures
 
 ## Figure 5a: 16S rRNA Gene Copies
 
-    all_sample_data %>% 
-      filter(!is.na(rRNA_16S_copy_number_per_g_soil_logtrans)) %>% 
+Shown with error bars –&gt; error bars are smaller than size of symbol
+
+    abund_16s %>% 
       ggplot(
         aes(
-          x = distance_mm, 
-          y = rRNA_16S_copy_number_per_g_soil_logtrans, 
+          x = avg_dist_mm, 
+          y = mean_log_copy_per_g_soil, 
           shape = horizon
         )
       ) + 
       geom_line(linetype = 2, alpha = 0.6, size = 0.5) +
-      geom_point(size = 3) + 
+      geom_errorbar(
+        aes(
+          ymin = mean_log_copy_per_g_soil - se_log_copy_per_g_soil,
+          ymax = mean_log_copy_per_g_soil + se_log_copy_per_g_soil
+        ),
+        width = 0.25
+      ) +
+      geom_point(size = 4, fill = "white") + 
       scale_x_continuous(
         breaks = seq(from = 0, to = 10, by = 2),
         limits = c(-0.1, 10),
@@ -142,9 +153,9 @@ Read-in the ASVs identified as putative anaerobes per RAxML tree
       scale_y_continuous(
         breaks = seq(from = 4, to = 14, by = 1),
         limits = c(4, 11)
-      ) + 
+      ) +
       scale_shape_manual(
-        values = c(16, 2, 15, 1, 17)
+        values = c(16, 24, 15, 21)
       ) + 
       theme_bw() + 
       theme(
@@ -153,15 +164,16 @@ Read-in the ASVs identified as putative anaerobes per RAxML tree
         panel.grid = element_blank(),
         aspect.ratio = 1.2,
         legend.position = "none",
-        axis.text = element_text(size = 14),
-        axis.title = element_text(size = 16)
+        axis.text = element_text(size = 16),
+        axis.title = element_text(size = 18)
       ) + 
       labs(
-        x = "Distance from preferential flow paths (mm)",
-        y = "Log Copy Number/ g soil"
+        x = "Distance from preferential flow path (mm)",
+        y = expression("16S rRNA abundance (log copies g soil"^-1*")"),
+        shape = NULL
       ) 
 
-![](Figures_Microbial_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](Figures_Microbial_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ## Figure 5b: Relative Abundance of putative anaerobes
 
@@ -202,7 +214,7 @@ Read-in the ASVs identified as putative anaerobes per RAxML tree
       ) %>% 
       ggplot(aes(x = distance_mm, y = relative_anaerobe, shape = horizon)) + 
       geom_line(linetype = 2, alpha = 0.5) + 
-      geom_point(size = 3) + 
+      geom_point(size = 4, fill = "white") + 
       scale_y_continuous(
         breaks = c(0.02, 0.04, 0.06, 0.08, 0.10, 0.12),
         labels = scales::percent_format(accuracy = 1)
@@ -213,7 +225,7 @@ Read-in the ASVs identified as putative anaerobes per RAxML tree
         expand = expansion(mult = c(0, 0.05))
       ) +
       scale_shape_manual(
-        values = c(16, 2, 15, 1, 17)
+        values = c(16, 24, 15, 21, 17)
       ) + 
       theme_bw() + 
       theme(
@@ -222,16 +234,16 @@ Read-in the ASVs identified as putative anaerobes per RAxML tree
         panel.grid = element_blank(),
         aspect.ratio = 1.2,
         legend.position = "none",
-        axis.text = element_text(size = 14),
-        axis.title = element_text(size = 16)
+        axis.text = element_text(size = 16),
+        axis.title = element_text(size = 18)
       ) + 
       labs(
-        x = "Distance from preferential flow paths (mm)",
-        y = "% Abundance",
+        x = "Distance from preferential flow path (mm)",
+        y = "Relative abundance of putative anaerobes (%)",
         shape = NULL
       ) 
 
-![](Figures_Microbial_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](Figures_Microbial_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ### ID the 2 dominant putative anaerobe phyla
 
@@ -255,8 +267,6 @@ Read-in the ASVs identified as putative anaerobes per RAxML tree
       arrange(horizon, distance_mm) %>% 
       select(horizon, distance_mm, Kingdom, Phylum, relative_abundance, asv)
 
-    ## Adding missing grouping variables: `sample`
-
     ## # A tibble: 30 × 7
     ## # Groups:   sample [15]
     ##    sample    horizon distance_mm Kingdom Phylum  relative_abunda… asv           
@@ -273,7 +283,7 @@ Read-in the ASVs identified as putative anaerobes per RAxML tree
     ## 10 Yoko.12A… 1_Bh1          10   Archaea Euryar…           0.0371 CGGTAGTCTAGGG…
     ## # … with 20 more rows
 
-## Figure SI5: NMDS
+## Figure S5: NMDS
 
     set.seed(123)
 
@@ -357,9 +367,9 @@ Read-in the ASVs identified as putative anaerobes per RAxML tree
         shape = NULL
       ) 
 
-![](Figures_Microbial_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](Figures_Microbial_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
-## Figure SI6: Abundant phyla
+## Figure S6: Abundant phyla
 
 These are the 10 most abundant phyla in each sample
 
@@ -386,8 +396,6 @@ These are the 10 most abundant phyla in each sample
           )
       ) 
 
-    ## `summarise()` has grouped output by 'sample', 'Kingdom'. You can override using the `.groups` argument.
-
     top_10_phyla %>% 
       ggplot(aes(x = distance_mm, y = relative_phylum_abundance, fill = Phylum)) + 
       geom_col() + 
@@ -400,4 +408,4 @@ These are the 10 most abundant phyla in each sample
         y = "Relative Abundance"
       ) 
 
-![](Figures_Microbial_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](Figures_Microbial_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->

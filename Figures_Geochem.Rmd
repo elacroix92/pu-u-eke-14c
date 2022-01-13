@@ -1,7 +1,7 @@
 ---
-title: "Geochemical Figures"
-author: "Emily Lacroix"
-date: "9/23/2021"
+title: "JGR Biogeosciences - Geochemical Figures"
+author: "Emily Lacroix\n"
+date: "Last update: 1/13/2022"
 output: 
   github_document: 
     toc: TRUE
@@ -9,13 +9,12 @@ output:
 
 # Set-Up
 
-## knitr
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## libraries
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(readxl)
 library(lme4)
@@ -33,7 +32,8 @@ data_file <- "PuuEke_AllData.xlsx"
 
 
 ```{r include=FALSE}
-data_file <- "~/Box Sync/Stanford (elacroix@stanford.edu)/Research/AnoxicMicrositesHawaii/GCBSubmission/Data/GCB2021_PuuEke_AllData.xlsx"
+
+data_file <- "~/Box Sync/Stanford (elacroix@stanford.edu)/Research/AnoxicMicrositesHawaii/Data/PuuEke_AllData.xlsx"
 
 ```
 
@@ -47,8 +47,8 @@ data <-
 
 # Figure 2
 ## Make tibble 
-```{r}
-fig1_data <- 
+```{r warning=FALSE}
+fig2_data <- 
   data %>% 
   mutate_at(
     vars(horizon), 
@@ -63,16 +63,25 @@ fig1_data <-
           "Bg"
         )
     )
-  )
+  ) %>% 
+  separate(depth, into = c("top", "bottom", "unit"), remove = FALSE) %>% 
+  mutate(
+    across(bottom, ~if_else(.=="cm", "86", .)),
+    across(c(bottom, top), as.numeric),
+    avg_depth_cm = (bottom + top) / 2
+  ) %>% 
+  select(-c(top, bottom, unit))
+
+  
 ```
 
 
 ## Figure 2a: %C and PFP Distance
 ```{r}
-fig1_data %>% 
+fig2_data %>% 
   ggplot(aes(x = distance_mm, y = perc_c, shape = horizon)) + 
   geom_line(linetype = 2, alpha = 0.6, size = 0.5) +
-  geom_point(size = 2) + 
+  geom_point(size = 3, fill = "white") + 
   scale_x_continuous(
     breaks = seq(from = 0, to = 10, by = 2),
     limits = c(-0.1, 10),
@@ -82,13 +91,14 @@ fig1_data %>%
     breaks = seq(from = 7, to = 14, by = 1)
   ) + 
   scale_shape_manual(
-    values = c(16, 2, 15, 1, 17)
+    values = c(16, 24, 15, 21, 17)
   ) + 
   facet_wrap(
     facets = vars(collection_yr), 
     scales = "free_y",
     ncol = 1
   ) + 
+  guides(shape = guide_legend(override.aes = list(size = 4))) + 
   theme_bw() + 
   theme(
     strip.background = element_blank(),
@@ -96,30 +106,34 @@ fig1_data %>%
     panel.grid = element_blank(),
     aspect.ratio = 1.2,
     legend.position = "right",
-    axis.text = element_text(size = 12),
-    axis.title = element_text(size = 14)
+    axis.text = element_text(size = 13),
+    axis.title = element_text(size = 16),
+    axis.title.x = element_text(margin = margin(t = 20)),
+    legend.text = element_text(size = 13),
+    legend.key.size = unit(0.8, "cm")
   ) + 
   labs(
-    x = "Distance from PFPs (mm)",
+    x = "Distance from preferential flow path (mm)",
     y = "Carbon (%)",
     shape = NULL
   ) 
+
 ```
 
 ## Figure 2b: Delta 14C
 
 ```{r}
-fig1_data %>% 
+fig2_data %>% 
   ggplot(aes(x = distance_mm, y = c14, shape = horizon)) + 
   geom_line(linetype = 2, alpha = 0.6, size = 0.5) +
-  geom_point(size = 2) + 
+  geom_point(size = 3, fill = "white") + 
   scale_x_continuous(
     breaks = seq(from = 0, to = 10, by = 2),
     limits = c(-0.1, 10),
     expand = expansion(mult = c(0, 0.05))
   ) + 
   scale_shape_manual(
-    values = c(16, 2, 15, 1, 17)
+    values = c(16, 24, 15, 21, 17)
   ) + 
   facet_wrap(
     facets = vars(collection_yr), 
@@ -128,6 +142,7 @@ fig1_data %>%
   ) + 
   expand_limits(y = -90) + 
   scale_y_continuous(breaks = seq(-100, -900, -100)) + 
+  guides(shape = guide_legend(override.aes = list(size = 4))) + 
   theme_bw() + 
   theme(
     strip.background = element_blank(),
@@ -135,11 +150,13 @@ fig1_data %>%
     panel.grid = element_blank(),
     aspect.ratio = 1.2,
     legend.position = "right",
-    axis.text = element_text(size = 12),
-    axis.title = element_text(size = 14)
+    axis.text = element_text(size = 13),
+    axis.title = element_text(size = 16),
+    axis.title.x = element_text(margin = margin(t = 20)),
+    legend.text = element_text(size = 13),
+    legend.key.size = unit(0.8, "cm")
   ) + 
   labs(
-    x = NULL,
     x = "Distance from preferential flow paths (mm)",
     y = expression(paste(Delta^{14}, "C (\u2030)")),
     shape = NULL
@@ -149,23 +166,24 @@ fig1_data %>%
 
 ## Figure 2c: C/N
 ```{r}
-fig1_data %>% 
+fig2_data %>% 
   ggplot(aes(x = distance_mm, y = c_to_n, shape = horizon)) + 
   geom_line(linetype = 2, alpha = 0.6, size = 0.5) +
-  geom_point(size = 2) + 
+  geom_point(size = 3, fill = "white") + 
   scale_x_continuous(
     breaks = seq(from = 0, to = 10, by = 2),
     limits = c(-0.1, 10),
     expand = expansion(mult = c(0, 0.05))
   ) + 
   scale_shape_manual(
-    values = c(16, 2, 15, 1, 17)
+    values = c(16, 24, 15, 21, 17)
   ) + 
  facet_wrap(
     facets = vars(collection_yr), 
     scales = "free",
     ncol = 1
   ) + 
+  guides(shape = guide_legend(override.aes = list(size = 4))) + 
   theme_bw() + 
   theme(
     strip.background = element_blank(),
@@ -173,479 +191,26 @@ fig1_data %>%
     panel.grid = element_blank(),
     aspect.ratio = 1.2,
     legend.position = "right",
-    axis.text = element_text(size = 12),
-    axis.title = element_text(size = 14)
-  ) + 
+    axis.text = element_text(size = 13),
+    axis.title = element_text(size = 16),
+    axis.title.x = element_text(margin = margin(t = 20)),
+    legend.text = element_text(size = 13),
+    legend.key.size = unit(0.8, "cm")
+  ) +  
   labs(
     x = "Distance from preferential flow paths (mm)",
     y = "C/N molar ratio",
     shape = NULL
   ) 
 
-```
-
-# Figure 3: Ammonium oxalate extractable Al+Fe+Si vs. Distance from PFP
-
-```{r}
-fig1_data %>% 
-  ggplot(aes(x = distance_mm, y = sro_minerals_mmol_kg, shape = horizon)) + 
-  geom_line(linetype = 2, alpha = 0.6, size = 0.5) +
-  geom_point(size = 2) + 
-  scale_x_continuous(
-    breaks = seq(from = 0, to = 10, by = 2),
-    limits = c(-0.1, 10),
-    expand = expansion(mult = c(0, 0.05))
-  ) + 
-  scale_shape_manual(
-    values = c(16, 2, 15, 1, 17)
-  ) + 
-  facet_wrap(
-    facets = vars(collection_yr), 
-    scales = "free",
-    ncol = 1
-  ) + 
-  theme_bw() + 
-  theme(
-    strip.background = element_blank(),
-    strip.text.x = element_blank(),
-    panel.grid = element_blank(),
-    aspect.ratio = 1.2,
-    legend.position = "right",
-    axis.text = element_text(size = 12),
-    axis.title = element_text(size = 14)
-  ) + 
-  labs(
-    x = "Distance from preferential flow paths (mm)",
-    y = "Oxalate extractable Al+Fe+Si (moles/kg)",
-    shape = NULL
-  ) 
 
 ```
 
-
-```{r}
-fig1_data %>% 
-  mutate(
-    sro_norm = sro_minerals_mmol_kg / perc_c
-  ) %>% 
-  ggplot(aes(x = distance_mm, y = sro_norm, shape = horizon)) + 
-  geom_line(linetype = 2, alpha = 0.6, size = 0.5) +
-  geom_point(size = 2) + 
-  scale_x_continuous(
-    breaks = seq(from = 0, to = 10, by = 2),
-    limits = c(-0.1, 10),
-    expand = expansion(mult = c(0, 0.05))
-  ) + 
-  scale_shape_manual(
-    values = c(16, 2, 15, 1, 17)
-  ) + 
-  facet_wrap(
-    facets = vars(collection_yr), 
-    scales = "free",
-    ncol = 1
-  ) + 
-  theme_bw() + 
-  theme(
-    strip.background = element_blank(),
-    strip.text.x = element_blank(),
-    panel.grid = element_blank(),
-    aspect.ratio = 1.2,
-    legend.position = "right",
-    axis.text = element_text(size = 12),
-    axis.title = element_text(size = 14)
-  ) + 
-  labs(
-    x = "Distance from preferential flow paths (mm)",
-    y = "SRO / % C",
-    shape = NULL
-  ) 
-
-```
-
-# Figure 4: delta14C vs. Oxalate Extractavle Al+Fe+Si (mol/kg)
-
-```{r}
-fig1_data %>% 
-  mutate(across(collection_yr, as.factor)) %>% 
-  ggplot(aes(x = sro_minerals_mmol_kg, y = c14, color = collection_yr)) + 
-  geom_smooth(
-    method = "lm", 
-    se = FALSE,
-    color = "darkgray", 
-    linetype = "solid"
-  ) +
-  geom_point(aes(shape = horizon), size = 2) + 
-  scale_y_reverse(
-    breaks = seq(from = -100, to = -800, by = -100)
-  ) +
-  scale_shape_manual(
-    values = c(16, 2, 15, 1, 17)
-  ) + 
-  scale_color_manual(
-    values = c("black", "darkred"), 
-    labels = c("Pedon A", "Pedon B")
-  ) +
-  expand_limits(y = c(-100, -400)) +
-  guides(
-    shape = "none"
-  ) + 
-  theme_bw() + 
-  theme(
-    strip.background = element_blank(),
-    strip.text.x = element_blank(),
-    panel.grid = element_blank(),
-    aspect.ratio = 1.2,
-    axis.text = element_text(size = 12),
-    axis.title = element_text(size = 14),
-    legend.position = "top",
-    legend.text = element_text(size = 10)
-  ) + 
-  labs(
-    y = expression(paste(Delta^{14}, "C (\u2030)")),
-    x = "Oxalate extractable Al+Fe+Si (mol/kg)",
-    color = NULL,
-    shape = NULL
-  ) 
-
-```
-
-
-## Linear fit - SRO vs. 14C
-```{r}
-sro_14c_lm <- lm(
-  c14~sro_minerals_mmol_kg, 
-  data = fig1_data 
-  )
-
-sro_14c_lm %>% summary()
-```
-
-
-## Figure SI4a: residuals - SRO vs. 14C
-
-```{r}
-
-
-fig1_data %>% 
-  select(c14, sro_minerals_mmol_kg, horizon, collection_yr) %>% 
-  mutate(
-    predicted = predict(sro_14c_lm), 
-    residuals = residuals(sro_14c_lm),
-    across(collection_yr, as_factor)
-  ) %>% 
-  ggplot(aes(x = sro_minerals_mmol_kg)) + 
-  geom_hline(aes(yintercept = 0), color = "darkgray", linetype = 2) +
-  geom_point(
-    aes(y = residuals, shape = horizon, color = collection_yr), 
-    size = 3
-  ) +
-  scale_color_manual(
-    values = c("black", "darkred"), 
-    labels = c("Pedon A", "Pedon B")
-  ) +
-  scale_y_continuous(limits = c(-100, 100)) +
-  theme_bw() + 
-  theme(
-    panel.grid = element_blank(),
-    axis.text = element_text(size = 18),
-    axis.title = element_text(size = 20),
-    legend.text = element_text(size = 16),
-    legend.title = element_text(size = 16)
-  ) + 
-  labs(
-    x = "SRO Mineral Content (mmol/kg)",
-    y = "Model residuals",
-    shape = "Horizon",
-    color = NULL
-  )
-
-
-
-
-```
-
-```{r}
-lmtest::bptest(sro_14c_lm)
-```
-Appears there may be some heteroscedasticity 
-
-# Simple linear regression - distance from PFP vs. 14C
-
-```{r}
-pfp_14c_lm <- lm(
-  c14~distance_mm, 
-  data = fig1_data 
-  )
-
-pfp_14c_lm %>% summary()
-
-```
-
-
-# Multiple Linear Regression
-
-## Linear fit - c14 ~ sro_minerals_mmol_kg + distance_mm
-```{r}
-
-sro_dist_14c_lm <- 
-  lm(c14 ~ sro_minerals_mmol_kg + distance_mm, data = fig1_data) 
-
-
-sro_dist_14c_lm %>% summary()
-
-```
-
-
-## Figure SI4b - multiple linear regression residuals
-
-```{r}
-fig1_data %>% 
-  select(c14, sro_minerals_mmol_kg, horizon, distance_mm, collection_yr) %>% 
-  mutate(
-    predicted = predict(sro_dist_14c_lm), 
-    residuals = residuals(sro_dist_14c_lm),
-    across(collection_yr, as_factor)
-  ) %>% 
-  ggplot(aes(x = sro_minerals_mmol_kg)) + 
-  geom_hline(aes(yintercept = 0), color = "darkgray", linetype = 2) +
-  geom_point(aes(y = residuals, shape = horizon, color = collection_yr), size = 3) +
-  scale_color_manual(
-    values = c("black", "darkred"), 
-    labels = c("Pedon A", "Pedon B")
-  ) +
-  scale_y_continuous(limits = c(-100, 100)) +
-  theme_bw() + 
-  theme(
-    panel.grid = element_blank(),
-    axis.text = element_text(size = 18),
-    axis.title = element_text(size = 20),
-    legend.text = element_text(size = 16),
-    legend.title = element_text(size = 16)
-  ) + 
-  labs(
-    x = "SRO Mineral Content (mmol/kg)",
-    y = "Model residuals",
-    shape = "Horizon",
-    color = NULL
-  )
-```
-
-Residuals appear less patterned and overall smaller. 
-
-```{r}
-lmtest::bptest(sro_dist_14c_lm)
-```
-
-
-# Linear Mixed-Effect Regression
-
-```{r}
-
-lmer_c14 <- lmer(c14 ~ distance_mm + sro_minerals_mmol_kg + (1|collection_yr), data = fig1_data) 
-
-anova(lmer_c14, ddf = "Kenward-Roger")
-summary(lmer_c14, ddf = "Kenward-Roger")
-
-r.squaredGLMM(lmer_c14)
-
-```
-
-## Linear fit - SRO + Depth (category) vs. 14C (NEED TO REVIEW)
-```{r}
-sro_depth_14c_lm <- lm(
-  c14~sro_minerals_mmol_kg + depth, 
-  data = fig1_data 
-  )
-
-sro_depth_14c_lm %>% summary()
-
-```
-## Linear fit - SRO + Depth (value) vs. 14C (NEED TO REVIEW)
-```{r}
-
-sro_depth_numeric_14c_lm <- 
-  lm(
-    c14~sro_minerals_mmol_kg + avg_depth_cm, 
-    data = 
-      fig1_data %>% 
-      separate(depth, into = c("top", "bottom", "unit")) %>% 
-      mutate(
-        across(c(top, bottom), as.integer),
-        avg_depth_cm = top + bottom / 2,
-        across(avg_depth_cm, ~if_else(is.na(.), 70, .))
-      ) 
-  )
-
-sro_depth_numeric_14c_lm %>% summary()
-
-
-
-```
-
-```{r}
-## Linear fit - SRO + Depth (value) vs. 14C (NEED TO REVIEW)
-
-
-sro_depth_numeric_dist_14c_lm <- 
-  lm(
-    c14~sro_minerals_mmol_kg + avg_depth_cm * distance_mm, 
-    data = 
-      fig1_data %>% 
-      separate(depth, into = c("top", "bottom", "unit")) %>% 
-      mutate(
-        across(c(top, bottom), as.integer),
-        avg_depth_cm = top + bottom / 2,
-        across(avg_depth_cm, ~if_else(is.na(.), 70, .))
-      ) 
-  )
-
-sro_depth_numeric_dist_14c_lm %>% summary()
-
-
-
-```
-
-
-
-## Linear fit - SRO + Horizon vs. 14C (NEED TO REVIEW)
-```{r}
-sro_hzn_14c_lm <- lm(
-  c14~sro_minerals_mmol_kg + horizon, 
-  data = fig1_data 
-  )
-
-sro_hzn_14c_lm %>% summary()
-
-
-```
-```{r}
-
-```
-
-
-## Linear fit - SRO + Horizon & distance_mm vs. 14C (NEED TO REVIEW)
-```{r}
-sro_hzn_14c_lm <- lm(
-  c14~sro_minerals_mmol_kg + horizon*distance_mm, 
-  data = fig1_data 
-  )
-
-sro_hzn_14c_lm %>% summary()
-
-
-```
-
-
-```{r}
-## Linear fit - SRO + Horizon vs. 14C (NEED TO REVIEW)
-sro_hzn_dist_14c_lm <- lm(
-  c14~sro_minerals_mmol_kg + horizon + distance_mm, 
-  data = fig1_data 
-  )
-
-sro_hzn_dist_14c_lm %>% summary()
-
-
-```
-
-
-
-
-## Linear fit - Depth (cat) vs. 14C Residual fit (NEED TO REVIEW)
-```{r}
-sro_depth_14c_lm <- lm(
-  c14~depth, 
-  data = fig1_data 
-  )
-
-sro_depth_14c_lm %>% summary()
-
-residuals <- sro_depth_14c_lm$residuals
-
-
-
-residual_lm <- 
-  lm(
-    residuals~sro_minerals_mmol_kg+distance_mm,
-    data = fig1_data %>% add_column(residuals)
-  )
-
-residual_lm %>% summary()
-
-```
-
-## Linear fit - Depth (cat) vs. 14C Residual fit (NEED TO REVIEW)
-```{r}
-
-depth_numeric_14c_lm <- 
-  lm(
-    c14~avg_depth_cm, 
-    data = 
-      fig1_data %>% 
-      separate(depth, into = c("top", "bottom", "unit")) %>% 
-      mutate(
-        across(c(top, bottom), as.integer),
-        avg_depth_cm = top + bottom / 2,
-        across(avg_depth_cm, ~if_else(is.na(.), 80, .))  #this is arbitrary
-      ) 
-  )
-
-
-depth_numeric_14c_lm %>% summary()
-
-depth_num_residuals <- depth_numeric_14c_lm$residuals
-
-residual_lm_depth_num <- 
-  lm(
-    depth_num_residuals~sro_minerals_mmol_kg + distance_mm,
-    data = 
-      fig1_data %>% 
-      separate(depth, into = c("top", "bottom", "unit")) %>% 
-      mutate(
-        across(c(top, bottom), as.integer),
-        avg_depth_cm = top + bottom / 2,
-        across(avg_depth_cm, ~if_else(is.na(.), 80, .))  #this is arbitrary
-      ) %>% 
-      add_column(depth_num_residuals)
-  )
-
-residual_lm_depth_num %>% summary()
-
-
-```
-
-## Linear fit - Horizon vs. 14C Residual fit (NEED TO REVIEW)
-```{r}
-
-horizon_14c_lm <- 
-  lm(
-    c14~horizon, 
-    data = fig1_data 
-  )
-
-
-horizon_14c_lm %>% summary()
-
-horizon_residuals <- horizon_14c_lm$residuals
-
-residual_lm_horizon <- 
-  lm(
-    horizon_residuals~sro_minerals_mmol_kg + distance_mm,
-    data = 
-      fig1_data %>% 
-      add_column(horizon_residuals)
-  )
-
-residual_lm_horizon %>% summary()
-
-
-```
-
-# Figure 6: Relative change in delta14C vs. PFP distance
-```{r}
-
-fig6_data <- 
-  fig1_data %>% 
+# Figure 3: Relative change in 14C vs. PFP distance
+```{r message=FALSE}
+
+fig3_data <- 
+  fig2_data %>% 
   pivot_wider(
     id_cols = c(horizon, collection_yr),
     names_from = distance_mm, 
@@ -664,12 +229,13 @@ fig6_data <-
     values_to = "relative_change_c14"
   ) %>% 
   mutate_at(vars(distance_mm), as.numeric)
+
 ```
 
 
 ```{r}
 
-fig6_data %>% 
+fig3_data %>% 
   ggplot(aes(x = distance_mm)) + 
   geom_line(
     data = 
@@ -692,11 +258,15 @@ fig6_data %>%
       y = avg_realtive_change_c14
     ),
     shape = 8,
-    size = 2
+    size = 3
   ) + 
-  geom_point(aes(shape = horizon, y = relative_change_c14), size = 2) + 
+  geom_point(
+    aes(shape = horizon, y = relative_change_c14), 
+    size = 3, 
+    fill = "white"
+  ) + 
   scale_shape_manual(
-    values = c(16, 2, 15, 1, 17)
+    values = c(16, 24, 15, 21, 17)
   ) + 
   scale_x_continuous(
     breaks = seq(from = 0, to = 10, by = 2),
@@ -710,22 +280,314 @@ fig6_data %>%
     strip.text.x = element_blank(),
     panel.grid = element_blank(),
     aspect.ratio = 1.2,
-    axis.text = element_text(size = 12),
-    axis.title = element_text(size = 14),
-    legend.position = "right"
+    legend.position = "right",
+    axis.text = element_text(size = 13),
+    axis.title = element_text(size = 16),
+    axis.title.x = element_text(margin = margin(t = 20)),
+    legend.text = element_text(size = 13),
+    legend.key.size = unit(0.8, "cm")
   ) +
   labs(
     shape = NULL,
-    x = "Distance from preferential flow paths (mm)",
-    y = expression(paste("Relative Change in",Delta^{14}, "C (\u2030)"))
+    x = "Distance from preferential flow path (mm)",
+    y = expression(paste("Relative Change in ",Delta^{14}, "C (\u2030)"))
   ) 
 
 ```
 
 
-# Figure SI3
+# Figure 4: SRO vs. Distance from PFP
+
 ```{r}
-fig1_data %>% 
+fig2_data %>% 
+  ggplot(aes(x = distance_mm, y = sro_minerals_mmol_kg, shape = horizon)) + 
+  geom_line(linetype = 2, alpha = 0.6, size = 0.5) +
+  geom_point(size = 3, fill = "white") + 
+  scale_x_continuous(
+    breaks = seq(from = 0, to = 10, by = 2),
+    limits = c(-0.1, 10),
+    expand = expansion(mult = c(0, 0.05))
+  ) + 
+  scale_shape_manual(
+    values = c(16, 24, 15, 21, 17)
+  ) + 
+  facet_wrap(
+    facets = vars(collection_yr), 
+    scales = "free",
+    ncol = 1
+  ) + 
+  theme_bw() + 
+  theme(
+    strip.background = element_blank(),
+    strip.text.x = element_blank(),
+    panel.grid = element_blank(),
+    aspect.ratio = 1.2,
+    legend.position = "right",
+    axis.text = element_text(size = 13),
+    axis.title = element_text(size = 16),
+    axis.title.x = element_text(margin = margin(t = 20)),
+    legend.text = element_text(size = 13),
+    legend.key.size = unit(0.8, "cm")
+  ) + 
+  labs(
+    x = "Distance from preferential flow path (mm)",
+    y = expression("Oxalate extractable Al+Fe+Si (mol "~kg^-1*")"),
+    shape = NULL
+  ) 
+
+
+```
+
+
+# Figure 6: 14C vs. SRO 
+
+```{r message=FALSE}
+fig2_data %>% 
+  mutate(across(collection_yr, as.factor)) %>% 
+  ggplot(aes(x = sro_minerals_mmol_kg, y = c14, color = collection_yr)) + 
+  geom_smooth(
+    method = "lm", 
+    se = FALSE,
+    color = "darkgray", 
+    linetype = "solid"
+  ) +
+  geom_point(aes(shape = horizon), size = 3) + 
+  scale_y_reverse(
+    breaks = seq(from = -100, to = -800, by = -100)
+  ) +
+  scale_shape_manual(
+    values = c(16, 2, 15, 1, 17)
+  ) + 
+  scale_color_manual(
+    values = c("black", "darkred"), 
+    labels = c("Pedon A", "Pedon B")
+  ) +
+  expand_limits(y = c(-100, -400)) +
+  guides(
+    shape = "none"
+  ) + 
+  theme_bw() + 
+  theme(
+    strip.background = element_blank(),
+    strip.text.x = element_blank(),
+    panel.grid = element_blank(),
+    aspect.ratio = 1.2,
+    legend.position = "right",
+    axis.text = element_text(size = 13),
+    axis.title = element_text(size = 16),
+    #axis.title.x = element_text(margin = margin(t = 20)),
+    legend.text = element_text(size = 13),
+    legend.key.size = unit(0.8, "cm")
+  ) + 
+  labs(
+    y = expression(paste(Delta^{14}, "C (\u2030)")),
+    x = expression("Oxalate extractable Al+Fe+Si (mol"~kg^-1*")"),
+    color = NULL,
+    shape = NULL
+  ) 
+
+```
+
+# Table 1: Linear Regression (Models 1-3)
+## Model 1 
+
+14C vs. SRO Mineral content
+```{r}
+
+sro_14c_lm <- lm(c14~sro_minerals_mmol_kg, data = fig2_data)
+
+sro_14c_lm %>% summary()
+
+lmtest::bptest(sro_14c_lm)
+
+```
+
+## Model 2 
+
+14C vs. Depth (cm)
+```{r}
+
+depth_14c_lm <- lm(c14~avg_depth_cm, data = fig2_data)
+
+depth_14c_lm %>% summary()
+
+lmtest::bptest(depth_14c_lm)
+
+```
+
+## Model 3
+
+14C vs. distance from PFP
+```{r}
+
+dist_14c_lm <- lm(c14~distance_mm, data = fig2_data)
+
+dist_14c_lm %>% summary()
+
+lmtest::bptest(dist_14c_lm)
+
+```
+
+# Table 1: Multiple Linear Regression (Models 4-7)
+## Model 4
+
+14C vs. distance + depth
+
+```{r}
+
+dist_depth_14c_lm <- lm(c14~distance_mm + avg_depth_cm, data = fig2_data)
+
+dist_depth_14c_lm %>% summary()
+
+lmtest::bptest(dist_depth_14c_lm)
+
+```
+
+## Model 5
+
+14C vs. distance + SRO
+
+```{r}
+
+dist_sro_14c_lm <- lm(c14~distance_mm + sro_minerals_mmol_kg, data = fig2_data)
+
+dist_sro_14c_lm %>% summary()
+
+lmtest::bptest(dist_sro_14c_lm)
+
+```
+
+## Model 6
+
+14C vs. SRO + depth
+
+```{r}
+
+depth_sro_14c_lm <- 
+  lm(c14~avg_depth_cm + sro_minerals_mmol_kg, data = fig2_data)
+
+depth_sro_14c_lm %>% summary()
+
+lmtest::bptest(depth_sro_14c_lm)
+
+```
+
+## Model 7
+
+14C vs. SRO + depth + distance
+
+```{r}
+
+depth_dist_sro_14c_lm <- 
+  lm(c14~avg_depth_cm + sro_minerals_mmol_kg + distance_mm, data = fig2_data)
+
+depth_dist_sro_14c_lm %>% summary()
+
+lmtest::bptest(depth_dist_sro_14c_lm)
+
+```
+
+
+# Table S2: Linear Mixed-Effect Regression (Models 8-14)
+
+## Model 8
+
+```{r}
+lmer_c14_sro <- 
+  lmer(c14 ~ sro_minerals_mmol_kg + (1|collection_yr), data = fig2_data) 
+
+anova(lmer_c14_sro, ddf = "Kenward-Roger")
+summary(lmer_c14_sro, ddf = "Kenward-Roger")
+
+r.squaredGLMM(lmer_c14_sro)
+
+```
+
+## Model 9
+
+```{r}
+lmer_c14_depth <- 
+  lmer(c14 ~ avg_depth_cm + (1|collection_yr), data = fig2_data) 
+
+anova(lmer_c14_depth, ddf = "Kenward-Roger")
+summary(lmer_c14_depth, ddf = "Kenward-Roger")
+
+r.squaredGLMM(lmer_c14_depth)
+
+```
+
+## Model 10
+
+```{r}
+lmer_c14_dist <- 
+  lmer(c14 ~ distance_mm + (1|collection_yr), data = fig2_data) 
+
+anova(lmer_c14_dist, ddf = "Kenward-Roger")
+summary(lmer_c14_dist, ddf = "Kenward-Roger")
+
+r.squaredGLMM(lmer_c14_dist)
+
+```
+
+## Model 11
+
+```{r}
+lmer_c14_dist_depth <- 
+  lmer(c14 ~ distance_mm + avg_depth_cm + (1|collection_yr), data = fig2_data) 
+
+anova(lmer_c14_dist_depth, ddf = "Kenward-Roger")
+summary(lmer_c14_dist_depth, ddf = "Kenward-Roger")
+
+r.squaredGLMM(lmer_c14_dist_depth)
+
+```
+
+## Model 12
+
+```{r}
+lmer_c14_dist_sro <- 
+  lmer(c14 ~ sro_minerals_mmol_kg + distance_mm + (1|collection_yr), data = fig2_data) 
+
+anova(lmer_c14_dist_sro, ddf = "Kenward-Roger")
+summary(lmer_c14_dist_sro, ddf = "Kenward-Roger")
+
+r.squaredGLMM(lmer_c14_dist_sro)
+
+```
+
+
+## Model 13
+
+```{r}
+lmer_c14_sro_depth <- 
+  lmer(c14 ~ sro_minerals_mmol_kg + avg_depth_cm + (1|collection_yr), data = fig2_data) 
+
+anova(lmer_c14_sro_depth, ddf = "Kenward-Roger")
+summary(lmer_c14_sro_depth, ddf = "Kenward-Roger")
+
+r.squaredGLMM(lmer_c14_sro_depth)
+
+```
+
+## Model 14
+
+```{r}
+lmer_c14_sro_depth_dist <- 
+  lmer(c14 ~ 
+         sro_minerals_mmol_kg + avg_depth_cm + distance_mm + (1|collection_yr), 
+       data = fig2_data
+    ) 
+
+anova(lmer_c14_sro_depth_dist, ddf = "Kenward-Roger")
+summary(lmer_c14_sro_depth_dist, ddf = "Kenward-Roger")
+
+r.squaredGLMM(lmer_c14_sro_depth_dist)
+
+```
+
+# Figure S1
+```{r}
+fig2_data %>% 
   ggplot(aes(x = distance_mm, y = perc_n, shape = horizon)) + 
   geom_line(linetype = 2, alpha = 0.6, size = 0.5) +
   geom_point(size = 2) + 
@@ -758,5 +620,158 @@ fig1_data %>%
     shape = NULL
   ) 
 ```
+
+# Figure S7: Residual plots 
+
+## Residuals of Model 1: 14C vs. SRO Mineral content 
+
+```{r}
+
+fig2_data %>% 
+  select(c14, sro_minerals_mmol_kg, horizon, collection_yr) %>% 
+  mutate(
+    predicted = predict(sro_14c_lm), 
+    residuals = residuals(sro_14c_lm),
+    across(collection_yr, as_factor)
+  ) %>% 
+  ggplot(aes(x = sro_minerals_mmol_kg)) + 
+  geom_hline(aes(yintercept = 0), color = "darkgray", linetype = 2) +
+  geom_point(
+    aes(y = residuals, shape = horizon, color = collection_yr), 
+    size = 3
+  ) +
+  scale_color_manual(
+    values = c("black", "darkred"), 
+    labels = c("Pedon A", "Pedon B")
+  ) +
+  scale_y_continuous(limits = c(-100, 100)) +
+  theme_bw() + 
+  theme(
+    panel.grid = element_blank(),
+    axis.text = element_text(size = 18),
+    axis.title = element_text(size = 20),
+    legend.text = element_text(size = 16),
+    legend.title = element_text(size = 16)
+  ) + 
+  labs(
+    x = expression("Oxalate extractable Al+Fe+Si (mol"~kg^-1*")"),
+    y = "Model residuals",
+    shape = "Horizon",
+    color = NULL
+  )
+
+```
+
+## Residuals of Model 5: 14C vs. SRO + Distance
+
+```{r}
+
+fig2_data %>% 
+  select(c14, sro_minerals_mmol_kg, horizon, distance_mm, collection_yr) %>% 
+  mutate(
+    predicted = predict(dist_sro_14c_lm), 
+    residuals = residuals(dist_sro_14c_lm),
+    across(collection_yr, as_factor)
+  ) %>% 
+  ggplot(aes(x = sro_minerals_mmol_kg)) + 
+  geom_hline(aes(yintercept = 0), color = "darkgray", linetype = 2) +
+  geom_point(aes(y = residuals, shape = horizon, color = collection_yr), size = 3) +
+  scale_color_manual(
+    values = c("black", "darkred"), 
+    labels = c("Pedon A", "Pedon B")
+  ) +
+  scale_y_continuous(limits = c(-100, 100)) +
+  theme_bw() + 
+  theme(
+    panel.grid = element_blank(),
+    axis.text = element_text(size = 18),
+    axis.title = element_text(size = 20),
+    legend.text = element_text(size = 16),
+    legend.title = element_text(size = 16)
+  ) + 
+  labs(
+    x = expression("Oxalate extractable Al+Fe+Si (mol"~kg^-1*")"),
+    y = "Model residuals",
+    shape = "Horizon",
+    color = NULL
+  )
+
+```
+Residuals appear less patterned and overall smaller. 
+
+## Residuals of Model 6: 14C vs. SRO + depth
+
+```{r}
+
+fig2_data %>% 
+  select(c14, sro_minerals_mmol_kg, horizon, distance_mm, collection_yr) %>% 
+  mutate(
+    predicted = predict(depth_sro_14c_lm), 
+    residuals = residuals(depth_sro_14c_lm),
+    across(collection_yr, as_factor)
+  ) %>% 
+  ggplot(aes(x = sro_minerals_mmol_kg)) + 
+  geom_hline(aes(yintercept = 0), color = "darkgray", linetype = 2) +
+  geom_point(aes(y = residuals, shape = horizon, color = collection_yr), size = 3) +
+  scale_color_manual(
+    values = c("black", "darkred"), 
+    labels = c("Pedon A", "Pedon B")
+  ) +
+  scale_y_continuous(limits = c(-100, 100)) +
+  theme_bw() + 
+  theme(
+    panel.grid = element_blank(),
+    axis.text = element_text(size = 18),
+    axis.title = element_text(size = 20),
+    legend.text = element_text(size = 16),
+    legend.title = element_text(size = 16)
+  ) + 
+  labs(
+    x = expression("Oxalate extractable Al+Fe+Si (mol"~kg^-1*")"),
+    y = "Model residuals",
+    shape = "Horizon",
+    color = NULL
+  )
+
+```
+
+
+## Residuals of Model 7: 14C vs. SRO + depth + distance
+
+```{r}
+
+fig2_data %>% 
+  select(c14, sro_minerals_mmol_kg, horizon, distance_mm, collection_yr) %>% 
+  mutate(
+    predicted = predict(depth_dist_sro_14c_lm), 
+    residuals = residuals(depth_dist_sro_14c_lm),
+    across(collection_yr, as_factor)
+  ) %>% 
+  ggplot(aes(x = sro_minerals_mmol_kg)) + 
+  geom_hline(aes(yintercept = 0), color = "darkgray", linetype = 2) +
+  geom_point(aes(y = residuals, shape = horizon, color = collection_yr), size = 3) +
+  scale_color_manual(
+    values = c("black", "darkred"), 
+    labels = c("Pedon A", "Pedon B")
+  ) +
+  scale_y_continuous(limits = c(-100, 100)) +
+  theme_bw() + 
+  theme(
+    panel.grid = element_blank(),
+    axis.text = element_text(size = 18),
+    axis.title = element_text(size = 20),
+    legend.text = element_text(size = 16),
+    legend.title = element_text(size = 16)
+  ) + 
+  labs(
+    x = expression("Oxalate extractable Al+Fe+Si (mol"~kg^-1*")"),
+    y = "Model residuals",
+    shape = "Horizon",
+    color = NULL
+  )
+
+```
+
+
 
 

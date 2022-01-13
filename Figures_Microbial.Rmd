@@ -1,7 +1,7 @@
 ---
-title: "Pu'u Eke - Microbial Figures"
-author: "Emily Lacroix"
-date: "9/23/2021"
+title: "JGR Biogeosciences - Microbial Figures"
+author: "Emily Lacroix\n"
+date: "Last update: 1/13/2022"
 output: 
   github_document: 
     toc: TRUE
@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Set-up
 
 ## libraries
-```{r}
+```{r message=FALSE}
 library(tidyverse)
 library(readxl)
 library(phyloseq)
@@ -31,9 +31,9 @@ parent_data_file <- "PuuEke_AllData.xlsx"
 
 
 ```{r include=FALSE}
-phyloseq_object_file <- "MPC_16S_phyloseq_2019_07_23.rds"
+phyloseq_object_file <- "~/Box Sync/Stanford (elacroix@stanford.edu)/Research/AnoxicMicrositesHawaii/GCBSubmission/Data/MPC_16S_phyloseq_2019_07_23.rds"
 
-parent_data_file <- "PuuEke_AllData.xlsx"
+parent_data_file <- "~/Box Sync/Stanford (elacroix@stanford.edu)/Research/AnoxicMicrositesHawaii/Data/PuuEke_AllData.xlsx"
 
 ```
 
@@ -79,8 +79,7 @@ taxonomic_table <-
   phyloseq_upperhzn_rel_abund %>% 
   tax_table() %>% 
   as("matrix") %>% 
-  as_tibble(rownames = "OTU") %>% 
-  rename(asv = OTU)
+  as_tibble(rownames = "asv")
 
 
 ```
@@ -88,7 +87,7 @@ taxonomic_table <-
 ### Sample Info
 Create sample information table from phyloseq object; create one that includes counts from 4 horizons and another that contains sample metadata for the upper horizons
 
-```{r warning=FALSE}
+```{r message=FALSE, warning=FALSE}
 all_sample_data <- 
   sample_data(raw_phyloseq_object) %>% 
   as_tibble(rownames = "sample")
@@ -98,13 +97,11 @@ sample_data <-
   as_tibble(rownames = "sample")
 
 
-all_sample_data
-
 ```
 
 ### Putative Anaerobes
 Read-in the ASVs identified as putative anaerobes per RAxML tree
-```{r warning}
+```{r}
 putative_anaerobes <- 
   parent_data_file %>% 
   read_xlsx(sheet = "PutativeAnaerobes") %>% 
@@ -113,44 +110,47 @@ putative_anaerobes <-
 
 ```
 
+### 16S abundance
+```{r message=FALSE, warning=FALSE}
 
-### 16S gene copy numbers with SD
-
-```{r}
-copies_16s <- 
+abund_16s <- 
   parent_data_file %>% 
-  read_xlsx(sheet = "Data") %>%
+  read_xlsx(sheet = "qPCR") %>% 
   mutate(
-    across(.cols = everything(), ~na_if(., "NA")),
-    across(.cols = contains(c("16s", "anaerobe")), as.numeric)
+    across(horizon, ~ factor(., levels = c("Bh1", "Bhg", "Bh2", "Bs")))
   ) %>% 
-  mutate(
-    rRNA_16S_copy_number_per_g = copy_number_16s_rrna_per_kg / 1000,
-    rRNA_16S_log_copies_per_g = log(rRNA_16S_copy_number_per_g),
-    sd_copies_per_g = sd_copy_number_16s / 1000,
-    sd_log_copies_per_g = log(sd_copies_per_g)
-  )
-  
-  
+  group_by(sample_id, horizon, depth, avg_dist_mm, pfp_distance_mm) %>% 
+  summarise(
+    mean_log_copy_per_g_soil = mean(log_copies_per_g_soil, na.rm = TRUE),
+    se_log_copy_per_g_soil = sd(log_copies_per_g_soil) / sqrt(n())
+  ) 
+
+
 ```
 
 
 # Figures
 ## Figure 5a: 16S rRNA Gene Copies
 
+Shown with error bars --> error bars are smaller than size of symbol
 ```{r}
-
-all_sample_data %>% 
-  filter(!is.na(rRNA_16S_copy_number_per_g_soil_logtrans)) %>% View()
+abund_16s %>% 
   ggplot(
     aes(
-      x = distance_mm, 
-      y = rRNA_16S_copy_number_per_g_soil_logtrans, 
+      x = avg_dist_mm, 
+      y = mean_log_copy_per_g_soil, 
       shape = horizon
     )
   ) + 
   geom_line(linetype = 2, alpha = 0.6, size = 0.5) +
-  geom_point(size = 3) + 
+  geom_errorbar(
+    aes(
+      ymin = mean_log_copy_per_g_soil - se_log_copy_per_g_soil,
+      ymax = mean_log_copy_per_g_soil + se_log_copy_per_g_soil
+    ),
+    width = 0.25
+  ) +
+  geom_point(size = 4, fill = "white") + 
   scale_x_continuous(
     breaks = seq(from = 0, to = 10, by = 2),
     limits = c(-0.1, 10),
@@ -159,9 +159,9 @@ all_sample_data %>%
   scale_y_continuous(
     breaks = seq(from = 4, to = 14, by = 1),
     limits = c(4, 11)
-  ) + 
+  ) +
   scale_shape_manual(
-    values = c(16, 2, 15, 1, 17)
+    values = c(16, 24, 15, 21)
   ) + 
   theme_bw() + 
   theme(
@@ -170,16 +170,16 @@ all_sample_data %>%
     panel.grid = element_blank(),
     aspect.ratio = 1.2,
     legend.position = "none",
-    axis.text = element_text(size = 14),
-    axis.title = element_text(size = 16)
+    axis.text = element_text(size = 16),
+    axis.title = element_text(size = 18)
   ) + 
   labs(
-    x = "Distance from preferential flow paths (mm)",
-    y = "Log Copy Number/ g soil"
+    x = "Distance from preferential flow path (mm)",
+    y = expression("16S rRNA abundance (log copies g soil"^-1*")"),
+    shape = NULL
   ) 
 
   
-
 ```
 
 
@@ -222,7 +222,7 @@ flattened_phyloseq_obj %>%
   ) %>% 
   ggplot(aes(x = distance_mm, y = relative_anaerobe, shape = horizon)) + 
   geom_line(linetype = 2, alpha = 0.5) + 
-  geom_point(size = 3) + 
+  geom_point(size = 4, fill = "white") + 
   scale_y_continuous(
     breaks = c(0.02, 0.04, 0.06, 0.08, 0.10, 0.12),
     labels = scales::percent_format(accuracy = 1)
@@ -233,7 +233,7 @@ flattened_phyloseq_obj %>%
     expand = expansion(mult = c(0, 0.05))
   ) +
   scale_shape_manual(
-    values = c(16, 2, 15, 1, 17)
+    values = c(16, 24, 15, 21, 17)
   ) + 
   theme_bw() + 
   theme(
@@ -242,18 +242,19 @@ flattened_phyloseq_obj %>%
     panel.grid = element_blank(),
     aspect.ratio = 1.2,
     legend.position = "none",
-    axis.text = element_text(size = 14),
-    axis.title = element_text(size = 16)
+    axis.text = element_text(size = 16),
+    axis.title = element_text(size = 18)
   ) + 
   labs(
-    x = "Distance from preferential flow paths (mm)",
-    y = "% Abundance",
+    x = "Distance from preferential flow path (mm)",
+    y = "Relative abundance of putative anaerobes (%)",
     shape = NULL
   ) 
+
 ```
 
 ### ID the 2 dominant putative anaerobe phyla
-```{r}  
+```{r message=FALSE}  
 
 flattened_phyloseq_obj %>% 
   left_join(putative_anaerobes, by = "asv") %>% 
@@ -279,7 +280,7 @@ flattened_phyloseq_obj %>%
 
 
 
-## Figure SI5: NMDS
+## Figure S5: NMDS
 ```{r}
 set.seed(123)
 
@@ -314,11 +315,11 @@ plot_ordination(
 
 ```
 
-## Figure SI6: Abundant phyla
+## Figure S6: Abundant phyla
 
 These are the 10 most abundant phyla in each sample
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 top_10_phyla <- 
   flattened_phyloseq_obj %>% 
   left_join(taxonomic_table, by = "asv") %>% 
@@ -359,6 +360,13 @@ top_10_phyla %>%
     y = "Relative Abundance"
   ) 
 ```
+
+
+
+
+
+
+
 
 
 
