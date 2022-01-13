@@ -26,14 +26,14 @@ library(ggrepel)
 ```{r eval=FALSE}
 phyloseq_object_file <- "MPC_16S_phyloseq_2019_07_23.rds"
 
-parent_data_file <- "GCB2021_PuuEke_AllData.xlsx"
+parent_data_file <- "PuuEke_AllData.xlsx"
 ```
 
 
 ```{r include=FALSE}
-phyloseq_object_file <- "~/Box Sync/Stanford (elacroix@stanford.edu)/Research/AnoxicMicrositesHawaii/GCBSubmission/Data/MPC_16S_phyloseq_2019_07_23.rds"
+phyloseq_object_file <- "MPC_16S_phyloseq_2019_07_23.rds"
 
-parent_data_file <- "~/Box Sync/Stanford (elacroix@stanford.edu)/Research/AnoxicMicrositesHawaii/GCBSubmission/Data/GCB2021_PuuEke_AllData.xlsx"
+parent_data_file <- "PuuEke_AllData.xlsx"
 
 ```
 
@@ -98,6 +98,8 @@ sample_data <-
   as_tibble(rownames = "sample")
 
 
+all_sample_data
+
 ```
 
 ### Putative Anaerobes
@@ -111,13 +113,35 @@ putative_anaerobes <-
 
 ```
 
+
+### 16S gene copy numbers with SD
+
+```{r}
+copies_16s <- 
+  parent_data_file %>% 
+  read_xlsx(sheet = "Data") %>%
+  mutate(
+    across(.cols = everything(), ~na_if(., "NA")),
+    across(.cols = contains(c("16s", "anaerobe")), as.numeric)
+  ) %>% 
+  mutate(
+    rRNA_16S_copy_number_per_g = copy_number_16s_rrna_per_kg / 1000,
+    rRNA_16S_log_copies_per_g = log(rRNA_16S_copy_number_per_g),
+    sd_copies_per_g = sd_copy_number_16s / 1000,
+    sd_log_copies_per_g = log(sd_copies_per_g)
+  )
+  
+  
+```
+
+
 # Figures
 ## Figure 5a: 16S rRNA Gene Copies
 
 ```{r}
 
 all_sample_data %>% 
-  filter(!is.na(rRNA_16S_copy_number_per_g_soil_logtrans)) %>% 
+  filter(!is.na(rRNA_16S_copy_number_per_g_soil_logtrans)) %>% View()
   ggplot(
     aes(
       x = distance_mm, 

@@ -9,7 +9,7 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-This repo contains the code and data to reproduce all results and figures in the 2021 JGR: Biogeosciences publication: **Mineral protection and resource limitations combine to explain profile-scale carbon persistence**. 
+TEST This repo contains the code and data to reproduce all results and figures in the 2021 JGR: Biogeosciences publication: **Mineral protection and resource limitations combine to explain profile-scale carbon persistence**. 
 
 `PuuEke_AllData.xlsx` contains all of the geochemical data used in analyses as well as some microbial data and a README tab explaining data types and units. `MPC_16S_phyloseq_2019_07_23.rds` is a phyloseq object, ready for import in R. 
 

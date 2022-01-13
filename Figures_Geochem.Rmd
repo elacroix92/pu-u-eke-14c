@@ -450,6 +450,197 @@ r.squaredGLMM(lmer_c14)
 
 ```
 
+## Linear fit - SRO + Depth (category) vs. 14C (NEED TO REVIEW)
+```{r}
+sro_depth_14c_lm <- lm(
+  c14~sro_minerals_mmol_kg + depth, 
+  data = fig1_data 
+  )
+
+sro_depth_14c_lm %>% summary()
+
+```
+## Linear fit - SRO + Depth (value) vs. 14C (NEED TO REVIEW)
+```{r}
+
+sro_depth_numeric_14c_lm <- 
+  lm(
+    c14~sro_minerals_mmol_kg + avg_depth_cm, 
+    data = 
+      fig1_data %>% 
+      separate(depth, into = c("top", "bottom", "unit")) %>% 
+      mutate(
+        across(c(top, bottom), as.integer),
+        avg_depth_cm = top + bottom / 2,
+        across(avg_depth_cm, ~if_else(is.na(.), 70, .))
+      ) 
+  )
+
+sro_depth_numeric_14c_lm %>% summary()
+
+
+
+```
+
+```{r}
+## Linear fit - SRO + Depth (value) vs. 14C (NEED TO REVIEW)
+
+
+sro_depth_numeric_dist_14c_lm <- 
+  lm(
+    c14~sro_minerals_mmol_kg + avg_depth_cm * distance_mm, 
+    data = 
+      fig1_data %>% 
+      separate(depth, into = c("top", "bottom", "unit")) %>% 
+      mutate(
+        across(c(top, bottom), as.integer),
+        avg_depth_cm = top + bottom / 2,
+        across(avg_depth_cm, ~if_else(is.na(.), 70, .))
+      ) 
+  )
+
+sro_depth_numeric_dist_14c_lm %>% summary()
+
+
+
+```
+
+
+
+## Linear fit - SRO + Horizon vs. 14C (NEED TO REVIEW)
+```{r}
+sro_hzn_14c_lm <- lm(
+  c14~sro_minerals_mmol_kg + horizon, 
+  data = fig1_data 
+  )
+
+sro_hzn_14c_lm %>% summary()
+
+
+```
+```{r}
+
+```
+
+
+## Linear fit - SRO + Horizon & distance_mm vs. 14C (NEED TO REVIEW)
+```{r}
+sro_hzn_14c_lm <- lm(
+  c14~sro_minerals_mmol_kg + horizon*distance_mm, 
+  data = fig1_data 
+  )
+
+sro_hzn_14c_lm %>% summary()
+
+
+```
+
+
+```{r}
+## Linear fit - SRO + Horizon vs. 14C (NEED TO REVIEW)
+sro_hzn_dist_14c_lm <- lm(
+  c14~sro_minerals_mmol_kg + horizon + distance_mm, 
+  data = fig1_data 
+  )
+
+sro_hzn_dist_14c_lm %>% summary()
+
+
+```
+
+
+
+
+## Linear fit - Depth (cat) vs. 14C Residual fit (NEED TO REVIEW)
+```{r}
+sro_depth_14c_lm <- lm(
+  c14~depth, 
+  data = fig1_data 
+  )
+
+sro_depth_14c_lm %>% summary()
+
+residuals <- sro_depth_14c_lm$residuals
+
+
+
+residual_lm <- 
+  lm(
+    residuals~sro_minerals_mmol_kg+distance_mm,
+    data = fig1_data %>% add_column(residuals)
+  )
+
+residual_lm %>% summary()
+
+```
+
+## Linear fit - Depth (cat) vs. 14C Residual fit (NEED TO REVIEW)
+```{r}
+
+depth_numeric_14c_lm <- 
+  lm(
+    c14~avg_depth_cm, 
+    data = 
+      fig1_data %>% 
+      separate(depth, into = c("top", "bottom", "unit")) %>% 
+      mutate(
+        across(c(top, bottom), as.integer),
+        avg_depth_cm = top + bottom / 2,
+        across(avg_depth_cm, ~if_else(is.na(.), 80, .))  #this is arbitrary
+      ) 
+  )
+
+
+depth_numeric_14c_lm %>% summary()
+
+depth_num_residuals <- depth_numeric_14c_lm$residuals
+
+residual_lm_depth_num <- 
+  lm(
+    depth_num_residuals~sro_minerals_mmol_kg + distance_mm,
+    data = 
+      fig1_data %>% 
+      separate(depth, into = c("top", "bottom", "unit")) %>% 
+      mutate(
+        across(c(top, bottom), as.integer),
+        avg_depth_cm = top + bottom / 2,
+        across(avg_depth_cm, ~if_else(is.na(.), 80, .))  #this is arbitrary
+      ) %>% 
+      add_column(depth_num_residuals)
+  )
+
+residual_lm_depth_num %>% summary()
+
+
+```
+
+## Linear fit - Horizon vs. 14C Residual fit (NEED TO REVIEW)
+```{r}
+
+horizon_14c_lm <- 
+  lm(
+    c14~horizon, 
+    data = fig1_data 
+  )
+
+
+horizon_14c_lm %>% summary()
+
+horizon_residuals <- horizon_14c_lm$residuals
+
+residual_lm_horizon <- 
+  lm(
+    horizon_residuals~sro_minerals_mmol_kg + distance_mm,
+    data = 
+      fig1_data %>% 
+      add_column(horizon_residuals)
+  )
+
+residual_lm_horizon %>% summary()
+
+
+```
+
 # Figure 6: Relative change in delta14C vs. PFP distance
 ```{r}
 
