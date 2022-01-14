@@ -315,7 +315,7 @@ Last update: 1/13/2022
 # Figure 4: SRO vs. Distance from PFP
 
     fig2_data %>% 
-      ggplot(aes(x = distance_mm, y = sro_minerals_mmol_kg, shape = horizon)) + 
+      ggplot(aes(x = distance_mm, y = sro_minerals_mol_kg, shape = horizon)) + 
       geom_line(linetype = 2, alpha = 0.6, size = 0.5) +
       geom_point(size = 3, fill = "white") + 
       scale_x_continuous(
@@ -356,7 +356,7 @@ Last update: 1/13/2022
 
     fig2_data %>% 
       mutate(across(collection_yr, as.factor)) %>% 
-      ggplot(aes(x = sro_minerals_mmol_kg, y = c14, color = collection_yr)) + 
+      ggplot(aes(x = sro_minerals_mol_kg, y = c14, color = collection_yr)) + 
       geom_smooth(
         method = "lm", 
         se = FALSE,
@@ -406,22 +406,22 @@ Last update: 1/13/2022
 
 14C vs. SRO Mineral content
 
-    sro_14c_lm <- lm(c14~sro_minerals_mmol_kg, data = fig2_data)
+    sro_14c_lm <- lm(c14~sro_minerals_mol_kg, data = fig2_data)
 
     sro_14c_lm %>% summary()
 
     ## 
     ## Call:
-    ## lm(formula = c14 ~ sro_minerals_mmol_kg, data = fig2_data)
+    ## lm(formula = c14 ~ sro_minerals_mol_kg, data = fig2_data)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
     ## -91.379 -27.931   1.901  20.554  88.923 
     ## 
     ## Coefficients:
-    ##                      Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)            45.780     15.257   3.001  0.00426 ** 
-    ## sro_minerals_mmol_kg -134.626      4.304 -31.281  < 2e-16 ***
+    ##                     Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)           45.780     15.257   3.001  0.00426 ** 
+    ## sro_minerals_mol_kg -134.626      4.304 -31.281  < 2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -549,23 +549,23 @@ Last update: 1/13/2022
 
 14C vs. distance + SRO
 
-    dist_sro_14c_lm <- lm(c14~distance_mm + sro_minerals_mmol_kg, data = fig2_data)
+    dist_sro_14c_lm <- lm(c14~distance_mm + sro_minerals_mol_kg, data = fig2_data)
 
     dist_sro_14c_lm %>% summary()
 
     ## 
     ## Call:
-    ## lm(formula = c14 ~ distance_mm + sro_minerals_mmol_kg, data = fig2_data)
+    ## lm(formula = c14 ~ distance_mm + sro_minerals_mol_kg, data = fig2_data)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
     ## -60.193 -25.608  -1.438  23.126  60.360 
     ## 
     ## Coefficients:
-    ##                      Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)            76.360     13.749   5.554 1.27e-06 ***
-    ## distance_mm            -7.261      1.424  -5.099 6.01e-06 ***
-    ## sro_minerals_mmol_kg -133.987      3.492 -38.368  < 2e-16 ***
+    ##                     Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)           76.360     13.749   5.554 1.27e-06 ***
+    ## distance_mm           -7.261      1.424  -5.099 6.01e-06 ***
+    ## sro_minerals_mol_kg -133.987      3.492 -38.368  < 2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -586,23 +586,23 @@ Last update: 1/13/2022
 14C vs. SRO + depth
 
     depth_sro_14c_lm <- 
-      lm(c14~avg_depth_cm + sro_minerals_mmol_kg, data = fig2_data)
+      lm(c14~avg_depth_cm + sro_minerals_mol_kg, data = fig2_data)
 
     depth_sro_14c_lm %>% summary()
 
     ## 
     ## Call:
-    ## lm(formula = c14 ~ avg_depth_cm + sro_minerals_mmol_kg, data = fig2_data)
+    ## lm(formula = c14 ~ avg_depth_cm + sro_minerals_mol_kg, data = fig2_data)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
     ## -75.174 -25.544  -1.636  24.637  89.674 
     ## 
     ## Coefficients:
-    ##                       Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)            35.4762    14.8981   2.381   0.0214 *  
-    ## avg_depth_cm            1.3822     0.5217   2.650   0.0109 *  
-    ## sro_minerals_mmol_kg -151.8763     7.6708 -19.799   <2e-16 ***
+    ##                      Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)           35.4762    14.8981   2.381   0.0214 *  
+    ## avg_depth_cm           1.3822     0.5217   2.650   0.0109 *  
+    ## sro_minerals_mol_kg -151.8763     7.6708 -19.799   <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -623,13 +623,13 @@ Last update: 1/13/2022
 14C vs. SRO + depth + distance
 
     depth_dist_sro_14c_lm <- 
-      lm(c14~avg_depth_cm + sro_minerals_mmol_kg + distance_mm, data = fig2_data)
+      lm(c14~avg_depth_cm + sro_minerals_mol_kg + distance_mm, data = fig2_data)
 
     depth_dist_sro_14c_lm %>% summary()
 
     ## 
     ## Call:
-    ## lm(formula = c14 ~ avg_depth_cm + sro_minerals_mmol_kg + distance_mm, 
+    ## lm(formula = c14 ~ avg_depth_cm + sro_minerals_mol_kg + distance_mm, 
     ##     data = fig2_data)
     ## 
     ## Residuals:
@@ -637,11 +637,11 @@ Last update: 1/13/2022
     ## -63.738 -25.681   0.359  21.134  61.927 
     ## 
     ## Coefficients:
-    ##                      Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)            66.042     13.145   5.024 8.10e-06 ***
-    ## avg_depth_cm            1.254      0.415   3.023  0.00408 ** 
-    ## sro_minerals_mmol_kg -149.663      6.106 -24.509  < 2e-16 ***
-    ## distance_mm            -7.032      1.317  -5.339 2.79e-06 ***
+    ##                     Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)           66.042     13.145   5.024 8.10e-06 ***
+    ## avg_depth_cm           1.254      0.415   3.023  0.00408 ** 
+    ## sro_minerals_mol_kg -149.663      6.106 -24.509  < 2e-16 ***
+    ## distance_mm           -7.032      1.317  -5.339 2.79e-06 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -662,13 +662,13 @@ Last update: 1/13/2022
 ## Model 8
 
     lmer_c14_sro <- 
-      lmer(c14 ~ sro_minerals_mmol_kg + (1|collection_yr), data = fig2_data) 
+      lmer(c14 ~ sro_minerals_mol_kg + (1|collection_yr), data = fig2_data) 
 
     anova(lmer_c14_sro, ddf = "Kenward-Roger")
 
     ## Type III Analysis of Variance Table with Kenward-Roger's method
-    ##                      Sum Sq Mean Sq NumDF  DenDF F value    Pr(>F)    
-    ## sro_minerals_mmol_kg 964778  964778     1 24.915  572.23 < 2.2e-16 ***
+    ##                     Sum Sq Mean Sq NumDF  DenDF F value    Pr(>F)    
+    ## sro_minerals_mol_kg 964778  964778     1 24.915  572.23 < 2.2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -676,7 +676,7 @@ Last update: 1/13/2022
 
     ## Linear mixed model fit by REML. t-tests use Kenward-Roger's method [
     ## lmerModLmerTest]
-    ## Formula: c14 ~ sro_minerals_mmol_kg + (1 | collection_yr)
+    ## Formula: c14 ~ sro_minerals_mol_kg + (1 | collection_yr)
     ##    Data: fig2_data
     ## 
     ## REML criterion at convergence: 501.5
@@ -692,9 +692,9 @@ Last update: 1/13/2022
     ## Number of obs: 50, groups:  collection_yr, 2
     ## 
     ## Fixed effects:
-    ##                      Estimate Std. Error       df t value Pr(>|t|)    
-    ## (Intercept)            44.488     19.520    8.391   2.279   0.0507 .  
-    ## sro_minerals_mmol_kg -134.232      5.611   24.915 -23.921   <2e-16 ***
+    ##                     Estimate Std. Error       df t value Pr(>|t|)    
+    ## (Intercept)           44.488     19.520    8.391   2.279   0.0507 .  
+    ## sro_minerals_mol_kg -134.232      5.611   24.915 -23.921   <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -855,14 +855,14 @@ Last update: 1/13/2022
 ## Model 12
 
     lmer_c14_dist_sro <- 
-      lmer(c14 ~ sro_minerals_mmol_kg + distance_mm + (1|collection_yr), data = fig2_data) 
+      lmer(c14 ~ sro_minerals_mol_kg + distance_mm + (1|collection_yr), data = fig2_data) 
 
     anova(lmer_c14_dist_sro, ddf = "Kenward-Roger")
 
     ## Type III Analysis of Variance Table with Kenward-Roger's method
-    ##                       Sum Sq Mean Sq NumDF  DenDF F value    Pr(>F)    
-    ## sro_minerals_mmol_kg 1078643 1078643     1 39.294 991.861 < 2.2e-16 ***
-    ## distance_mm            29082   29082     1 46.011  26.742 4.933e-06 ***
+    ##                      Sum Sq Mean Sq NumDF  DenDF F value    Pr(>F)    
+    ## sro_minerals_mol_kg 1078643 1078643     1 39.294 991.861 < 2.2e-16 ***
+    ## distance_mm           29082   29082     1 46.011  26.742 4.933e-06 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -870,7 +870,7 @@ Last update: 1/13/2022
 
     ## Linear mixed model fit by REML. t-tests use Kenward-Roger's method [
     ## lmerModLmerTest]
-    ## Formula: c14 ~ sro_minerals_mmol_kg + distance_mm + (1 | collection_yr)
+    ## Formula: c14 ~ sro_minerals_mol_kg + distance_mm + (1 | collection_yr)
     ##    Data: fig2_data
     ## 
     ## REML criterion at convergence: 477.5
@@ -886,10 +886,10 @@ Last update: 1/13/2022
     ## Number of obs: 50, groups:  collection_yr, 2
     ## 
     ## Fixed effects:
-    ##                      Estimate Std. Error       df t value Pr(>|t|)    
-    ## (Intercept)            72.485     16.578   10.129   4.372  0.00135 ** 
-    ## sro_minerals_mmol_kg -132.780      4.216   39.294 -31.494  < 2e-16 ***
-    ## distance_mm            -7.279      1.408   46.011  -5.171 4.93e-06 ***
+    ##                     Estimate Std. Error       df t value Pr(>|t|)    
+    ## (Intercept)           72.485     16.578   10.129   4.372  0.00135 ** 
+    ## sro_minerals_mol_kg -132.780      4.216   39.294 -31.494  < 2e-16 ***
+    ## distance_mm           -7.279      1.408   46.011  -5.171 4.93e-06 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -906,16 +906,16 @@ Last update: 1/13/2022
 ## Model 13
 
     lmer_c14_sro_depth <- 
-      lmer(c14 ~ sro_minerals_mmol_kg + avg_depth_cm + (1|collection_yr), data = fig2_data) 
+      lmer(c14 ~ sro_minerals_mol_kg + avg_depth_cm + (1|collection_yr), data = fig2_data) 
 
     ## boundary (singular) fit: see ?isSingular
 
     anova(lmer_c14_sro_depth, ddf = "Kenward-Roger")
 
     ## Type III Analysis of Variance Table with Kenward-Roger's method
-    ##                      Sum Sq Mean Sq NumDF   DenDF  F value   Pr(>F)    
-    ## sro_minerals_mmol_kg 202032  202032     1  4.4068 134.2263 0.000182 ***
-    ## avg_depth_cm           5274    5274     1 13.7571   3.5038 0.082641 .  
+    ##                     Sum Sq Mean Sq NumDF   DenDF  F value   Pr(>F)    
+    ## sro_minerals_mol_kg 202032  202032     1  4.4068 134.2263 0.000182 ***
+    ## avg_depth_cm          5274    5274     1 13.7571   3.5038 0.082641 .  
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -923,7 +923,7 @@ Last update: 1/13/2022
 
     ## Linear mixed model fit by REML. t-tests use Kenward-Roger's method [
     ## lmerModLmerTest]
-    ## Formula: c14 ~ sro_minerals_mmol_kg + avg_depth_cm + (1 | collection_yr)
+    ## Formula: c14 ~ sro_minerals_mol_kg + avg_depth_cm + (1 | collection_yr)
     ##    Data: fig2_data
     ## 
     ## REML criterion at convergence: 494.3
@@ -939,10 +939,10 @@ Last update: 1/13/2022
     ## Number of obs: 50, groups:  collection_yr, 2
     ## 
     ## Fixed effects:
-    ##                       Estimate Std. Error        df t value Pr(>|t|)    
-    ## (Intercept)            35.4762    17.7045    9.7228   2.004 0.073736 .  
-    ## sro_minerals_mmol_kg -151.8763    13.1091    4.4068 -11.586 0.000182 ***
-    ## avg_depth_cm            1.3822     0.7384   13.7571   1.872 0.082641 .  
+    ##                      Estimate Std. Error        df t value Pr(>|t|)    
+    ## (Intercept)           35.4762    17.7045    9.7228   2.004 0.073736 .  
+    ## sro_minerals_mol_kg -151.8763    13.1091    4.4068 -11.586 0.000182 ***
+    ## avg_depth_cm           1.3822     0.7384   13.7571   1.872 0.082641 .  
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -962,7 +962,7 @@ Last update: 1/13/2022
 
     lmer_c14_sro_depth_dist <- 
       lmer(c14 ~ 
-             sro_minerals_mmol_kg + avg_depth_cm + distance_mm + (1|collection_yr), 
+             sro_minerals_mol_kg + avg_depth_cm + distance_mm + (1|collection_yr), 
            data = fig2_data
         ) 
 
@@ -971,10 +971,10 @@ Last update: 1/13/2022
     anova(lmer_c14_sro_depth_dist, ddf = "Kenward-Roger")
 
     ## Type III Analysis of Variance Table with Kenward-Roger's method
-    ##                      Sum Sq Mean Sq NumDF  DenDF  F value    Pr(>F)    
-    ## sro_minerals_mmol_kg 194352  194352     1  4.348 204.7002 8.030e-05 ***
-    ## avg_depth_cm           4308    4308     1 13.502   4.5372   0.05209 .  
-    ## distance_mm           26829   26829     1 45.187  28.2575 3.161e-06 ***
+    ##                     Sum Sq Mean Sq NumDF  DenDF  F value    Pr(>F)    
+    ## sro_minerals_mol_kg 194352  194352     1  4.348 204.7002 8.030e-05 ***
+    ## avg_depth_cm          4308    4308     1 13.502   4.5372   0.05209 .  
+    ## distance_mm          26829   26829     1 45.187  28.2575 3.161e-06 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -982,7 +982,7 @@ Last update: 1/13/2022
 
     ## Linear mixed model fit by REML. t-tests use Kenward-Roger's method [
     ## lmerModLmerTest]
-    ## Formula: c14 ~ sro_minerals_mmol_kg + avg_depth_cm + distance_mm + (1 |  
+    ## Formula: c14 ~ sro_minerals_mol_kg + avg_depth_cm + distance_mm + (1 |  
     ##     collection_yr)
     ##    Data: fig2_data
     ## 
@@ -999,11 +999,11 @@ Last update: 1/13/2022
     ## Number of obs: 50, groups:  collection_yr, 2
     ## 
     ## Fixed effects:
-    ##                      Estimate Std. Error       df t value Pr(>|t|)    
-    ## (Intercept)            66.042     14.924   14.608   4.425 0.000522 ***
-    ## sro_minerals_mmol_kg -149.663     10.461    4.348 -14.307 8.03e-05 ***
-    ## avg_depth_cm            1.254      0.589   13.502   2.130 0.052086 .  
-    ## distance_mm            -7.032      1.323   45.187  -5.316 3.16e-06 ***
+    ##                     Estimate Std. Error       df t value Pr(>|t|)    
+    ## (Intercept)           66.042     14.924   14.608   4.425 0.000522 ***
+    ## sro_minerals_mol_kg -149.663     10.461    4.348 -14.307 8.03e-05 ***
+    ## avg_depth_cm           1.254      0.589   13.502   2.130 0.052086 .  
+    ## distance_mm           -7.032      1.323   45.187  -5.316 3.16e-06 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -1062,13 +1062,13 @@ Last update: 1/13/2022
 ## Residuals of Model 1: 14C vs. SRO Mineral content
 
     fig2_data %>% 
-      select(c14, sro_minerals_mmol_kg, horizon, collection_yr) %>% 
+      select(c14, sro_minerals_mol_kg, horizon, collection_yr) %>% 
       mutate(
         predicted = predict(sro_14c_lm), 
         residuals = residuals(sro_14c_lm),
         across(collection_yr, as_factor)
       ) %>% 
-      ggplot(aes(x = sro_minerals_mmol_kg)) + 
+      ggplot(aes(x = sro_minerals_mol_kg)) + 
       geom_hline(aes(yintercept = 0), color = "darkgray", linetype = 2) +
       geom_point(
         aes(y = residuals, shape = horizon, color = collection_yr), 
@@ -1099,13 +1099,13 @@ Last update: 1/13/2022
 ## Residuals of Model 5: 14C vs. SRO + Distance
 
     fig2_data %>% 
-      select(c14, sro_minerals_mmol_kg, horizon, distance_mm, collection_yr) %>% 
+      select(c14, sro_minerals_mol_kg, horizon, distance_mm, collection_yr) %>% 
       mutate(
         predicted = predict(dist_sro_14c_lm), 
         residuals = residuals(dist_sro_14c_lm),
         across(collection_yr, as_factor)
       ) %>% 
-      ggplot(aes(x = sro_minerals_mmol_kg)) + 
+      ggplot(aes(x = sro_minerals_mol_kg)) + 
       geom_hline(aes(yintercept = 0), color = "darkgray", linetype = 2) +
       geom_point(aes(y = residuals, shape = horizon, color = collection_yr), size = 3) +
       scale_color_manual(
@@ -1134,13 +1134,13 @@ Residuals appear less patterned and overall smaller.
 ## Residuals of Model 6: 14C vs. SRO + depth
 
     fig2_data %>% 
-      select(c14, sro_minerals_mmol_kg, horizon, distance_mm, collection_yr) %>% 
+      select(c14, sro_minerals_mol_kg, horizon, distance_mm, collection_yr) %>% 
       mutate(
         predicted = predict(depth_sro_14c_lm), 
         residuals = residuals(depth_sro_14c_lm),
         across(collection_yr, as_factor)
       ) %>% 
-      ggplot(aes(x = sro_minerals_mmol_kg)) + 
+      ggplot(aes(x = sro_minerals_mol_kg)) + 
       geom_hline(aes(yintercept = 0), color = "darkgray", linetype = 2) +
       geom_point(aes(y = residuals, shape = horizon, color = collection_yr), size = 3) +
       scale_color_manual(
@@ -1168,13 +1168,13 @@ Residuals appear less patterned and overall smaller.
 ## Residuals of Model 7: 14C vs. SRO + depth + distance
 
     fig2_data %>% 
-      select(c14, sro_minerals_mmol_kg, horizon, distance_mm, collection_yr) %>% 
+      select(c14, sro_minerals_mol_kg, horizon, distance_mm, collection_yr) %>% 
       mutate(
         predicted = predict(depth_dist_sro_14c_lm), 
         residuals = residuals(depth_dist_sro_14c_lm),
         across(collection_yr, as_factor)
       ) %>% 
-      ggplot(aes(x = sro_minerals_mmol_kg)) + 
+      ggplot(aes(x = sro_minerals_mol_kg)) + 
       geom_hline(aes(yintercept = 0), color = "darkgray", linetype = 2) +
       geom_point(aes(y = residuals, shape = horizon, color = collection_yr), size = 3) +
       scale_color_manual(

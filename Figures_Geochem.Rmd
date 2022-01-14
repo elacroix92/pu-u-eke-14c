@@ -300,7 +300,7 @@ fig3_data %>%
 
 ```{r}
 fig2_data %>% 
-  ggplot(aes(x = distance_mm, y = sro_minerals_mmol_kg, shape = horizon)) + 
+  ggplot(aes(x = distance_mm, y = sro_minerals_mol_kg, shape = horizon)) + 
   geom_line(linetype = 2, alpha = 0.6, size = 0.5) +
   geom_point(size = 3, fill = "white") + 
   scale_x_continuous(
@@ -344,7 +344,7 @@ fig2_data %>%
 ```{r message=FALSE}
 fig2_data %>% 
   mutate(across(collection_yr, as.factor)) %>% 
-  ggplot(aes(x = sro_minerals_mmol_kg, y = c14, color = collection_yr)) + 
+  ggplot(aes(x = sro_minerals_mol_kg, y = c14, color = collection_yr)) + 
   geom_smooth(
     method = "lm", 
     se = FALSE,
@@ -394,7 +394,7 @@ fig2_data %>%
 14C vs. SRO Mineral content
 ```{r}
 
-sro_14c_lm <- lm(c14~sro_minerals_mmol_kg, data = fig2_data)
+sro_14c_lm <- lm(c14~sro_minerals_mol_kg, data = fig2_data)
 
 sro_14c_lm %>% summary()
 
@@ -449,7 +449,7 @@ lmtest::bptest(dist_depth_14c_lm)
 
 ```{r}
 
-dist_sro_14c_lm <- lm(c14~distance_mm + sro_minerals_mmol_kg, data = fig2_data)
+dist_sro_14c_lm <- lm(c14~distance_mm + sro_minerals_mol_kg, data = fig2_data)
 
 dist_sro_14c_lm %>% summary()
 
@@ -464,7 +464,7 @@ lmtest::bptest(dist_sro_14c_lm)
 ```{r}
 
 depth_sro_14c_lm <- 
-  lm(c14~avg_depth_cm + sro_minerals_mmol_kg, data = fig2_data)
+  lm(c14~avg_depth_cm + sro_minerals_mol_kg, data = fig2_data)
 
 depth_sro_14c_lm %>% summary()
 
@@ -479,7 +479,7 @@ lmtest::bptest(depth_sro_14c_lm)
 ```{r}
 
 depth_dist_sro_14c_lm <- 
-  lm(c14~avg_depth_cm + sro_minerals_mmol_kg + distance_mm, data = fig2_data)
+  lm(c14~avg_depth_cm + sro_minerals_mol_kg + distance_mm, data = fig2_data)
 
 depth_dist_sro_14c_lm %>% summary()
 
@@ -494,7 +494,7 @@ lmtest::bptest(depth_dist_sro_14c_lm)
 
 ```{r}
 lmer_c14_sro <- 
-  lmer(c14 ~ sro_minerals_mmol_kg + (1|collection_yr), data = fig2_data) 
+  lmer(c14 ~ sro_minerals_mol_kg + (1|collection_yr), data = fig2_data) 
 
 anova(lmer_c14_sro, ddf = "Kenward-Roger")
 summary(lmer_c14_sro, ddf = "Kenward-Roger")
@@ -546,7 +546,7 @@ r.squaredGLMM(lmer_c14_dist_depth)
 
 ```{r}
 lmer_c14_dist_sro <- 
-  lmer(c14 ~ sro_minerals_mmol_kg + distance_mm + (1|collection_yr), data = fig2_data) 
+  lmer(c14 ~ sro_minerals_mol_kg + distance_mm + (1|collection_yr), data = fig2_data) 
 
 anova(lmer_c14_dist_sro, ddf = "Kenward-Roger")
 summary(lmer_c14_dist_sro, ddf = "Kenward-Roger")
@@ -560,7 +560,7 @@ r.squaredGLMM(lmer_c14_dist_sro)
 
 ```{r}
 lmer_c14_sro_depth <- 
-  lmer(c14 ~ sro_minerals_mmol_kg + avg_depth_cm + (1|collection_yr), data = fig2_data) 
+  lmer(c14 ~ sro_minerals_mol_kg + avg_depth_cm + (1|collection_yr), data = fig2_data) 
 
 anova(lmer_c14_sro_depth, ddf = "Kenward-Roger")
 summary(lmer_c14_sro_depth, ddf = "Kenward-Roger")
@@ -574,7 +574,7 @@ r.squaredGLMM(lmer_c14_sro_depth)
 ```{r}
 lmer_c14_sro_depth_dist <- 
   lmer(c14 ~ 
-         sro_minerals_mmol_kg + avg_depth_cm + distance_mm + (1|collection_yr), 
+         sro_minerals_mol_kg + avg_depth_cm + distance_mm + (1|collection_yr), 
        data = fig2_data
     ) 
 
@@ -628,13 +628,13 @@ fig2_data %>%
 ```{r}
 
 fig2_data %>% 
-  select(c14, sro_minerals_mmol_kg, horizon, collection_yr) %>% 
+  select(c14, sro_minerals_mol_kg, horizon, collection_yr) %>% 
   mutate(
     predicted = predict(sro_14c_lm), 
     residuals = residuals(sro_14c_lm),
     across(collection_yr, as_factor)
   ) %>% 
-  ggplot(aes(x = sro_minerals_mmol_kg)) + 
+  ggplot(aes(x = sro_minerals_mol_kg)) + 
   geom_hline(aes(yintercept = 0), color = "darkgray", linetype = 2) +
   geom_point(
     aes(y = residuals, shape = horizon, color = collection_yr), 
@@ -667,13 +667,13 @@ fig2_data %>%
 ```{r}
 
 fig2_data %>% 
-  select(c14, sro_minerals_mmol_kg, horizon, distance_mm, collection_yr) %>% 
+  select(c14, sro_minerals_mol_kg, horizon, distance_mm, collection_yr) %>% 
   mutate(
     predicted = predict(dist_sro_14c_lm), 
     residuals = residuals(dist_sro_14c_lm),
     across(collection_yr, as_factor)
   ) %>% 
-  ggplot(aes(x = sro_minerals_mmol_kg)) + 
+  ggplot(aes(x = sro_minerals_mol_kg)) + 
   geom_hline(aes(yintercept = 0), color = "darkgray", linetype = 2) +
   geom_point(aes(y = residuals, shape = horizon, color = collection_yr), size = 3) +
   scale_color_manual(
@@ -704,13 +704,13 @@ Residuals appear less patterned and overall smaller.
 ```{r}
 
 fig2_data %>% 
-  select(c14, sro_minerals_mmol_kg, horizon, distance_mm, collection_yr) %>% 
+  select(c14, sro_minerals_mol_kg, horizon, distance_mm, collection_yr) %>% 
   mutate(
     predicted = predict(depth_sro_14c_lm), 
     residuals = residuals(depth_sro_14c_lm),
     across(collection_yr, as_factor)
   ) %>% 
-  ggplot(aes(x = sro_minerals_mmol_kg)) + 
+  ggplot(aes(x = sro_minerals_mol_kg)) + 
   geom_hline(aes(yintercept = 0), color = "darkgray", linetype = 2) +
   geom_point(aes(y = residuals, shape = horizon, color = collection_yr), size = 3) +
   scale_color_manual(
@@ -741,13 +741,13 @@ fig2_data %>%
 ```{r}
 
 fig2_data %>% 
-  select(c14, sro_minerals_mmol_kg, horizon, distance_mm, collection_yr) %>% 
+  select(c14, sro_minerals_mol_kg, horizon, distance_mm, collection_yr) %>% 
   mutate(
     predicted = predict(depth_dist_sro_14c_lm), 
     residuals = residuals(depth_dist_sro_14c_lm),
     across(collection_yr, as_factor)
   ) %>% 
-  ggplot(aes(x = sro_minerals_mmol_kg)) + 
+  ggplot(aes(x = sro_minerals_mol_kg)) + 
   geom_hline(aes(yintercept = 0), color = "darkgray", linetype = 2) +
   geom_point(aes(y = residuals, shape = horizon, color = collection_yr), size = 3) +
   scale_color_manual(
