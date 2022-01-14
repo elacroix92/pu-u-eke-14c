@@ -13,11 +13,11 @@ Last update: 1/13/2022
     -   [Figure 2a: %C and PFP Distance](#figure-2a-c-and-pfp-distance)
     -   [Figure 2b: Delta 14C](#figure-2b-delta-14c)
     -   [Figure 2c: C/N](#figure-2c-cn)
--   [Figure 3: Relative change in 14C vs. PFP
+-   [Figure 3: Relative change in 14C vs PFP
     distance](#figure-3-relative-change-in-14c-vs-pfp-distance)
--   [Figure 4: SRO vs. Distance from
+-   [Figure 4: SRO vs Distance from
     PFP](#figure-4-sro-vs-distance-from-pfp)
--   [Figure 6: 14C vs. SRO](#figure-6-14c-vs-sro)
+-   [Figure 6: 14C vs SRO](#figure-6-14c-vs-sro)
 -   [Table 1: Linear Regression (Models
     1-3)](#table-1-linear-regression-models-1-3)
     -   [Model 1](#model-1)
@@ -40,13 +40,13 @@ Last update: 1/13/2022
     -   [Model 14](#model-14)
 -   [Figure S1](#figure-s1)
 -   [Figure S7: Residual plots](#figure-s7-residual-plots)
-    -   [Residuals of Model 1: 14C vs. SRO Mineral
+    -   [Residuals of Model 1: 14C vs SRO Mineral
         content](#residuals-of-model-1-14c-vs-sro-mineral-content)
-    -   [Residuals of Model 5: 14C vs. SRO +
+    -   [Residuals of Model 5: 14C vs SRO +
         Distance](#residuals-of-model-5-14c-vs-sro--distance)
-    -   [Residuals of Model 6: 14C vs. SRO +
+    -   [Residuals of Model 6: 14C vs SRO +
         depth](#residuals-of-model-6-14c-vs-sro--depth)
-    -   [Residuals of Model 7: 14C vs. SRO + depth +
+    -   [Residuals of Model 7: 14C vs SRO + depth +
         distance](#residuals-of-model-7-14c-vs-sro--depth--distance)
 
 # Set-Up
@@ -226,7 +226,7 @@ Last update: 1/13/2022
 
 ![](Figures_Geochem_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
-# Figure 3: Relative change in 14C vs. PFP distance
+# Figure 3: Relative change in 14C vs PFP distance
 
     fig3_data <- 
       fig2_data %>% 
@@ -312,7 +312,7 @@ Last update: 1/13/2022
 
 ![](Figures_Geochem_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
-# Figure 4: SRO vs. Distance from PFP
+# Figure 4: SRO vs Distance from PFP
 
     fig2_data %>% 
       ggplot(aes(x = distance_mm, y = sro_minerals_mol_kg, shape = horizon)) + 
@@ -352,7 +352,7 @@ Last update: 1/13/2022
 
 ![](Figures_Geochem_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
-# Figure 6: 14C vs. SRO
+# Figure 6: 14C vs SRO
 
     fig2_data %>% 
       mutate(across(collection_yr, as.factor)) %>% 
@@ -1059,7 +1059,7 @@ Last update: 1/13/2022
 
 # Figure S7: Residual plots
 
-## Residuals of Model 1: 14C vs. SRO Mineral content
+## Residuals of Model 1: 14C vs SRO Mineral content
 
     fig2_data %>% 
       select(c14, sro_minerals_mol_kg, horizon, collection_yr) %>% 
@@ -1096,7 +1096,7 @@ Last update: 1/13/2022
 
 ![](Figures_Geochem_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
 
-## Residuals of Model 5: 14C vs. SRO + Distance
+## Residuals of Model 5: 14C vs SRO + Distance
 
     fig2_data %>% 
       select(c14, sro_minerals_mol_kg, horizon, distance_mm, collection_yr) %>% 
@@ -1131,7 +1131,7 @@ Last update: 1/13/2022
 ![](Figures_Geochem_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
 Residuals appear less patterned and overall smaller.
 
-## Residuals of Model 6: 14C vs. SRO + depth
+## Residuals of Model 6: 14C vs SRO + depth
 
     fig2_data %>% 
       select(c14, sro_minerals_mol_kg, horizon, distance_mm, collection_yr) %>% 
@@ -1165,7 +1165,7 @@ Residuals appear less patterned and overall smaller.
 
 ![](Figures_Geochem_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
-## Residuals of Model 7: 14C vs. SRO + depth + distance
+## Residuals of Model 7: 14C vs SRO + depth + distance
 
     fig2_data %>% 
       select(c14, sro_minerals_mol_kg, horizon, distance_mm, collection_yr) %>% 

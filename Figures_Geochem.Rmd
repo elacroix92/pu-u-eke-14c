@@ -206,7 +206,7 @@ fig2_data %>%
 
 ```
 
-# Figure 3: Relative change in 14C vs. PFP distance
+# Figure 3: Relative change in 14C vs PFP distance
 ```{r message=FALSE}
 
 fig3_data <- 
@@ -296,7 +296,7 @@ fig3_data %>%
 ```
 
 
-# Figure 4: SRO vs. Distance from PFP
+# Figure 4: SRO vs Distance from PFP
 
 ```{r}
 fig2_data %>% 
@@ -339,7 +339,7 @@ fig2_data %>%
 ```
 
 
-# Figure 6: 14C vs. SRO 
+# Figure 6: 14C vs SRO 
 
 ```{r message=FALSE}
 fig2_data %>% 
@@ -623,7 +623,7 @@ fig2_data %>%
 
 # Figure S7: Residual plots 
 
-## Residuals of Model 1: 14C vs. SRO Mineral content 
+## Residuals of Model 1: 14C vs SRO Mineral content 
 
 ```{r}
 
@@ -662,7 +662,7 @@ fig2_data %>%
 
 ```
 
-## Residuals of Model 5: 14C vs. SRO + Distance
+## Residuals of Model 5: 14C vs SRO + Distance
 
 ```{r}
 
@@ -699,7 +699,7 @@ fig2_data %>%
 ```
 Residuals appear less patterned and overall smaller. 
 
-## Residuals of Model 6: 14C vs. SRO + depth
+## Residuals of Model 6: 14C vs SRO + depth
 
 ```{r}
 
@@ -736,7 +736,7 @@ fig2_data %>%
 ```
 
 
-## Residuals of Model 7: 14C vs. SRO + depth + distance
+## Residuals of Model 7: 14C vs SRO + depth + distance
 
 ```{r}
 
